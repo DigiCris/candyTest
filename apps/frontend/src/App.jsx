@@ -72,22 +72,15 @@ function AuthPage({ onAuthenticated }) {
   const [password, setPassword] = useState('CandyUser1!2026');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [recovery, setRecovery] = useState('');
-  const [pendingUser, setPendingUser] = useState(null);
 
   async function submit(event) {
     event.preventDefault();
-    setBusy(true); setError(''); setRecovery('');
+    setBusy(true); setError('');
     try {
       const result = mode === 'login'
         ? await candy.login(username, password)
         : await candy.register(username, password);
-      if (result.recoveryPhrase) {
-        setRecovery(result.recoveryPhrase);
-        setPendingUser(result.user);
-      } else {
-        onAuthenticated(result.user);
-      }
+      onAuthenticated(result.user);
     } catch (err) {
       setError(errorMessage(err));
     } finally { setBusy(false); }
@@ -100,7 +93,7 @@ function AuthPage({ onAuthenticated }) {
         <h1>El juego de mesa de tus fichas Candy.</h1>
         <p className="muted">Transferencias instantáneas, control total de tu saldo y partidas verificables en cada tirada.</p>
         <ul className="showcase-list">
-          <li><IconShield size={19} /> Custodia y control total de tus fichas</li>
+          <li><IconShield size={19} /> Sin frases semilla: entrás con tu usuario</li>
           <li><IconRepeat size={19} /> Transferencias entre jugadores al instante</li>
           <li><IconSearch size={19} /> Resultado de cada partida, verificable</li>
         </ul>
@@ -124,7 +117,6 @@ function AuthPage({ onAuthenticated }) {
           <Button busy={busy} type="submit">{mode === 'login' ? 'Entrar a la mesa' : 'Crear mi cuenta'}</Button>
         </form>
         <Notice type="error">{error}</Notice>
-        {recovery && <Notice type="warning"><strong>Frase de recuperación — se muestra una sola vez:</strong><code>{recovery}</code><Button onClick={() => onAuthenticated(pendingUser)} className="recovery-button">Ya la guardé, continuar</Button></Notice>}
         <div className="demo-hint"><strong>Cuenta de invitado:</strong> user1 / CandyUser1!2026</div>
       </section>
     </div>

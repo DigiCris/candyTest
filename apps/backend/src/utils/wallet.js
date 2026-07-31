@@ -18,6 +18,7 @@ const G = {
   y: 0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8n,
 };
 const UINT32_MAX = 0xffffffff;
+export const DEFAULT_ACCOUNT_PATH = "m/44'/60'/0'";
 const MASK_64 = (1n << 64n) - 1n;
 const XPUB_VERSION = Buffer.from('0488b21e', 'hex');
 const BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
@@ -439,16 +440,39 @@ export function deriveAddressFromXpub(xpub, index = 0) {
   return publicKeyToAddress(node.publicKey);
 }
 
-export function deriveWalletFromMnemonic(mnemonic, index = 0) {
-  const seed = mnemonicToSeed(mnemonic);
-  const accountNode = derivePrivatePath(seed, "m/44'/60'/0'");
-  const xpub = serializeXpub(accountNode);
+export function isValidXpub(xpub) {
+  try {
+    parseXpub(String(xpub));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Derives a watch-only wallet from an account-level xpub. This is the only
+ * derivation the service performs: it needs no seed phrase and no private key,
+ * so the signing seed can stay offline in a cold wallet.
+ */
+export function deriveWalletFromXpub(xpub, index = 0, accountPath = DEFAULT_ACCOUNT_PATH) {
   const address = deriveAddressFromXpub(xpub, index);
   return {
     xpub,
     address,
-    accountPath: "m/44'/60'/0'",
-    addressPath: `m/44'/60'/0'/0/${index}`,
+    accountPath,
+    addressPath: `${accountPath}/0/${index}`,
     addressIndex: index,
   };
+}
+
+/**
+ * Offline helper: turns a seed phrase into the account xpub that gets stored in
+ * the database. Intended to be run once, off this machine, by whoever holds the
+ * cold wallet — never during registration.
+ */
+export function deriveWalletFromMnemonic(mnemonic, index = 0) {
+  const seed = mnemonicToSeed(mnemonic);
+  const accountNode = derivePrivatePath(seed, DEFAULT_ACCOUNT_PATH);
+  const xpub = serializeXpub(accountNode);
+  return deriveWalletFromXpub(xpub, index, DEFAULT_ACCOUNT_PATH);
 }

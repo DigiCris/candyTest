@@ -85,11 +85,7 @@ export function createApp() {
   app.post('/api/auth/register', async (req, res) => {
     const result = await registerUser({ username: req.body?.username, password: req.body?.password, role: 'user' });
     setSession(res, result.user.id);
-    res.status(201).json({
-      user: result.user,
-      recoveryPhrase: result.recoveryPhrase,
-      warning: 'This phrase is returned once. Store it offline; the database stores only the xpub and address.',
-    });
+    res.status(201).json({ user: result.user });
   });
 
   app.post('/api/auth/login', async (req, res) => {

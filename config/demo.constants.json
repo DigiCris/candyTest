@@ -1,11 +1,16 @@
 {
-  "warning": "DEMO LOCAL ONLY. Never reuse these usernames, passwords or mnemonic phrases in production.",
+  "warning": "DEMO LOCAL ONLY. Never reuse these usernames or passwords in production.",
   "token": {
     "name": "Candy",
     "symbol": "🍬",
     "fallbackSymbol": "$CA",
     "decimals": 6,
     "onlyOwnerOrAllowed": false
+  },
+  "wallet": {
+    "comment": "Watch-only account xpub. Stored in the database at bootstrap; every user address is derived from it as <accountPath>/0/<index>. The matching seed belongs in an offline cold wallet and is never needed by this service. This demo value is the account xpub of the publicly known Hardhat test mnemonic, so it holds no secret whatsoever — replace it with your own cold-wallet xpub before any real use.",
+    "accountPath": "m/44'/60'/0'",
+    "accountXpub": "xpub6Ce9NcJvTk36xtLSrJLZqE7wtgA5deCeYs7rSQtreh4cj6ByPtrg9sD7V2FNFLPnf8heNP3FGkeV9qwfzvZNSd54JoNXVsXFYSYwHsnJxqP"
   },
   "bootstrap": {
     "secret": "candy-local-bootstrap-2026-change-me"
@@ -21,35 +26,30 @@
       "username": "admin",
       "password": "CandyAdmin!2026",
       "role": "admin",
-      "mnemonic": "various ranch merry debate faith tooth smart little census rare salt emerge",
       "initialCandy": "1000000"
     },
     {
       "username": "user1",
       "password": "CandyUser1!2026",
       "role": "user",
-      "mnemonic": "paper curve dose rural door velvet vibrant width degree utility indicate daring",
       "initialCandy": "1000"
     },
     {
       "username": "user2",
       "password": "CandyUser2!2026",
       "role": "user",
-      "mnemonic": "market across doll simple verify basic gospel useless olive leader trigger income",
       "initialCandy": "1000"
     },
     {
       "username": "user3",
       "password": "CandyUser3!2026",
       "role": "user",
-      "mnemonic": "riot catch across release twelve place insect tilt nuclear salad salmon february",
       "initialCandy": "1000"
     },
     {
       "username": "gameEngine",
       "password": "CandyGame!2026",
       "role": "game_engine",
-      "mnemonic": "general degree lion faith tiny gym brush velvet error message oil tape",
       "initialCandy": "100000"
     }
   ]

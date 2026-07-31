@@ -29,12 +29,12 @@ La identidad está abstraída del token. Cambiar JWT por otro método requiere s
 
 Tablas principales:
 
-- `users`: identidad, role, address y xpub.
+- `users`: identidad, role, address, xpub de cuenta, paths e índice de derivación.
 - `balances`: una fila bloqueable por usuario.
 - `allowances`: `(owner_id, spender_id)`.
 - `token_metadata`: metadata y total supply.
 - `token_events`: ledger de mint, burn, transfer y approval.
-- `app_settings`: flag `onlyOwnerOrAllowed`.
+- `app_settings`: flag `onlyOwnerOrAllowed` y xpub de cuenta watch‑only (`walletAccount`).
 - `games`: commitment, secreto, elecciones y resultado.
 
 ## Atomicidad
@@ -60,13 +60,24 @@ Tablas principales:
 
 ## Wallets frías
 
-Cada usuario tiene su propia mnemonic. El servidor de demo la conoce únicamente durante el registro o bootstrap, deriva un xpub de cuenta y luego guarda:
+**Ningún usuario tiene frase semilla.** Hay un único xpub de cuenta *watch‑only* guardado en `app_settings` (key `walletAccount`), y cada address de usuario se deriva de ese xpub:
 
-- xpub;
-- address;
-- paths de derivación.
+1. Se lee el xpub de cuenta desde la base.
+2. Se reclama el siguiente índice con la secuencia `wallet_address_index_seq` (atómica, sin reutilización).
+3. Se deriva `<accountPath>/0/<index>` usando sólo la clave pública.
+4. Se guardan address, xpub, paths e índice.
 
-El backend no necesita private keys para operar Candy porque Candy es un ledger Web2. La address se usa como identificador interoperable y para consultar activos públicos en Base.
+La semilla correspondiente vive en una **cold wallet offline que nunca se conecta a este servicio**. Derivar desde un xpub requiere únicamente datos públicos, así que el backend es estructuralmente incapaz de firmar o mover fondos: no hay private keys que filtrar.
+
+`deriveWalletFromMnemonic` sigue existiendo en `utils/wallet.js`, pero sólo como herramienta offline para producir el xpub de cuenta a partir de una semilla. El registro nunca la invoca.
+
+### Rol de la address
+
+El backend no necesita private keys para operar Candy porque Candy es un ledger Web2:
+
+- Los balances viven en la tabla `balances`; la address no custodia nada.
+- La autorización sale siempre de la sesión del usuario (`identityHook`), nunca de una firma de wallet.
+- La address es un identificador estable: sirve para mostrar la cuenta, recibir futuros pagos desde la cold wallet y consultar activos públicos en Base.
 
 ## Juego
 

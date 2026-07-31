@@ -228,7 +228,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
 .notice.info { border: 1px solid var(--line); background: rgba(255,255,255,.04); }
 .notice code { display: block; margin-top: 8px; padding: 9px; border-radius: 6px; background: rgba(0,0,0,.25); }
 .demo-hint { margin-top: 22px; color: var(--muted); font-size: .8rem; line-height: 1.5; }
-.recovery-button { width: 100%; margin-top: 12px; }
 
 /* ---------- app shell / topbar ---------- */
 .app-shell { min-height: 100vh; }

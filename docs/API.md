@@ -10,7 +10,9 @@ Todas las cantidades se envían y reciben como strings decimales raw. Con `decim
 { "username": "alice", "password": "Password!2026" }
 ```
 
-Devuelve el usuario, configura la cookie de sesión y muestra una sola vez la mnemonic generada.
+Devuelve el usuario y configura la cookie de sesión.
+
+No hay frase semilla: la address del usuario se deriva del xpub de cuenta watch‑only guardado en la base, en el siguiente índice libre. La respuesta incluye `address`, `xpub`, `accountPath` y `addressPath`, todos datos públicos.
 
 ### `POST /api/auth/login`
 

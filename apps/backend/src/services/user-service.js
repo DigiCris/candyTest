@@ -1,6 +1,6 @@
 import { pool, withTransaction } from '../db/pool.js';
 import { AppError, assert } from '../utils/errors.js';
-import { generateMnemonic, deriveWalletFromMnemonic } from '../utils/wallet.js';
+import { allocateWallet } from './wallet-service.js';
 import { hashPassword, verifyPassword } from '../utils/password.js';
 
 export function normalizeUsername(username) {
@@ -49,15 +49,16 @@ export async function getUserByIdentifier(identifier, client = pool, { required 
   return user;
 }
 
-export async function registerUser({ username, password, role = 'user', mnemonic }, clientOverride) {
+export async function registerUser({ username, password, role = 'user' }, clientOverride) {
   const cleanUsername = validateUsername(username);
   const cleanPassword = validatePassword(password);
   assert(['admin', 'user', 'game_engine'].includes(role), 400, 'INVALID_ROLE', 'Invalid user role.');
-  const recoveryPhrase = mnemonic || generateMnemonic();
-  const wallet = deriveWalletFromMnemonic(recoveryPhrase, 0);
   const passwordHash = await hashPassword(cleanPassword);
 
   const create = async (client) => {
+    // Watch-only address derived from the account xpub in the database. The user
+    // never gets a seed phrase; the signing seed stays in an offline cold wallet.
+    const wallet = await allocateWallet(client);
     try {
       const inserted = await client.query(
         `INSERT INTO users(
@@ -89,7 +90,7 @@ export async function registerUser({ username, password, role = 'user', mnemonic
   };
 
   const row = clientOverride ? await create(clientOverride) : await withTransaction(create);
-  return { user: serializeUser(row), recoveryPhrase };
+  return { user: serializeUser(row) };
 }
 
 export async function authenticateUser(username, password) {

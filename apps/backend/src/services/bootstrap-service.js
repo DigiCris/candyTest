@@ -3,6 +3,7 @@ import { getConfig } from '../utils/config.js';
 import { humanToRaw } from '../utils/amounts.js';
 import { registerUser } from './user-service.js';
 import { setOnlyOwnerOrAllowed } from './settings-service.js';
+import { setWalletAccount } from './wallet-service.js';
 import { candyToken } from './token-service.js';
 
 export async function seedDemoIfEmpty() {
@@ -20,6 +21,9 @@ export async function seedDemoIfEmpty() {
       [config.token.name, config.token.symbol, config.token.fallbackSymbol, config.token.decimals],
     );
     await setOnlyOwnerOrAllowed(config.token.onlyOwnerOrAllowed, client);
+    // Store the watch-only account xpub before creating anyone: every address is
+    // derived from it, in registration order, starting at index 0.
+    await setWalletAccount(config.wallet, client);
 
     const created = [];
     for (const entry of config.users) {
