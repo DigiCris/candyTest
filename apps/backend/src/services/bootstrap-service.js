@@ -23,7 +23,10 @@ export async function seedDemoIfEmpty() {
     await setOnlyOwnerOrAllowed(config.token.onlyOwnerOrAllowed, client);
     // Store the watch-only account xpub before creating anyone: every address is
     // derived from it, in registration order, starting at index 0.
-    await setWalletAccount(config.wallet, client);
+    await setWalletAccount({
+      xpub: config.wallet.accountXpub,
+      accountPath: config.wallet.accountPath,
+    }, client);
 
     const created = [];
     for (const entry of config.users) {
